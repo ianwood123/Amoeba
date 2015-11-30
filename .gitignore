@@ -1,0 +1,15 @@
+*.class
+build.xml
+*.html
+dist/Amoeba.jnlp
+*.js
+dist/run112036737/web-files/get_java.png
+*.jnlp
+dist/run112036737/web-files/javafx-loading-100x100.gif
+*.png
+nbproject/*
+*.properties
+dist/Amoeba.jar
+*.gif
+dist/*
+manifest.mf
