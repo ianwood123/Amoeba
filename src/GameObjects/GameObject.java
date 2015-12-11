@@ -5,25 +5,17 @@
  */
 package GameObjects;
 
-import javafx.scene.Node;
-import javafx.scene.paint.Color;
+import DataModel.DataObject;
 
 /**
  *
  * @author woodi
  */
-public abstract class GameObject {
-    
-    public abstract Node getModel();
-    
-    public abstract void updateModel(Double x, Double y, Double width, Color c);
-    
-    public final Long id;
-    
-    protected GameObject(Long id){
-        this.id = id;
+public abstract class GameObject extends DataObject{
+
+    GameObject(Long id){
+    super(id);
     }
-    
     protected Long dirt = System.currentTimeMillis();
     
     public void resetDirt(){
@@ -32,6 +24,6 @@ public abstract class GameObject {
     
     public boolean tooDirty(){
          
-        return System.currentTimeMillis() > dirt + 500;
+        return System.currentTimeMillis() > dirt + 1000;
     }
 }

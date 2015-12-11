@@ -5,11 +5,13 @@
  */
 package GameModels;
 
+import javafx.scene.shape.Rectangle;
+
 /**
  *
  * @author woodi
  */
-public class ChatMessageModel {
+public class ChatMessageModel extends Rectangle{
 
     public ChatMessageModel(String m, Long id) {
     }

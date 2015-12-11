@@ -5,11 +5,11 @@
  */
 package Commands;
 
+import DataModel.DataObject;
 import Game.GameWorld;
+import GameModels.BlobModel;
 import GameObjects.Blob;
-import GameObjects.GameObject;
 import Messages.BlobStateMessage;
-import java.util.Objects;
 import javafx.scene.paint.Color;
 
 /**
@@ -21,7 +21,7 @@ public class SetBlobCommand implements MessageCommand<BlobStateMessage> {
 
     GameWorld world;
     BlobStateMessage bsm;
-
+    boolean consumed = false;
     public SetBlobCommand(BlobStateMessage message, GameWorld gw) {
         world = gw;
         bsm = message;
@@ -30,16 +30,22 @@ public class SetBlobCommand implements MessageCommand<BlobStateMessage> {
 
     @Override
     public void execute() {
-        Long id = (long) -1;
-        for (GameObject go : world.getObjects()) {
-            if (Objects.equals(go.id, bsm.id)) {
-                go.updateModel(bsm.x, bsm.y, bsm.size, Color.web(bsm.color));
-                go.resetDirt();
-                id = go.id;
+        Blob b;
+        for(DataObject gom : world.getScreen().getDataQueue()){
+            if(gom.id.get() == bsm.id){
+                b = (Blob) gom;
+                b.colorProperty.set(Color.valueOf(bsm.color));
+                b.radiusProperty.set(bsm.size/2);
+                b.xProperty.set(bsm.x);
+                b.yProperty.set(bsm.y);
+                consumed = true;
             }
         }
-        if (id == -1) {
-            world.addGameObject(new Blob(bsm.x, bsm.y, bsm.size, Color.web(bsm.color), bsm.id));
+        if(!consumed){
+            b = new Blob(bsm.x,bsm.y,bsm.size,Color.valueOf(bsm.color),bsm.username,bsm.id);
+            BlobModel bm = new BlobModel(b);
+            world.nodes.add(new BlobModel(bm));
         }
     }
+
 }

@@ -20,7 +20,7 @@ public abstract class GameMessageHandler implements Runnable {
     MessageQueue queue;
     NetworkMessageQueue net;
     boolean shuttingDown;
-    
+
     GameMessageHandler(NetworkMessageQueue net, MessageQueue q, CommandFactory of, MessageFactory mf){
         this.net = net;
         this.mf = mf;

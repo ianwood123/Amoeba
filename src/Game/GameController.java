@@ -8,13 +8,16 @@ package Game;
 import MentalWookieYodels.MessageQueue;
 import MentalWookieYodels.NetworkMessageQueue;
 import Messages.MessageFactory;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
-import javafx.scene.Group;
 import javafx.util.Duration;
+import screen.Screen;
 
 /**
  *
@@ -32,18 +35,22 @@ public class GameController {
     
     ExecutorService exe = Executors.newFixedThreadPool(3);
     
-    public GameController(NetworkMessageQueue input, NetworkMessageQueue output, MessageFactory mf, MessageQueue in, MessageQueue out){
+    public GameController(NetworkMessageQueue input, NetworkMessageQueue output, MessageFactory mf, MessageQueue in, MessageQueue out, Screen s){
 
-        world = new GameWorld();
+        world = new GameWorld(s);
+      
         goh = new GameOutputHandler(output,out,world.commandFactory,mf);
         gih = new GameInputHandler(input,in,world.commandFactory,mf);
+        
         Timeline timeline = new Timeline();
-        timeline.getKeyFrames().add(new KeyFrame(Duration.millis(1),(ActionEvent e)->{
-            exe.execute(world);
-            exe.execute(goh);
-            exe.execute(gih);
+        timeline.getKeyFrames().add(new KeyFrame(Duration.millis(16),(ActionEvent e)->{  
+        
+        exe.execute(world);
+        exe.execute(goh);
+        exe.execute(gih);
 
         }));
+        
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
 

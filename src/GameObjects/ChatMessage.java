@@ -6,8 +6,6 @@
 package GameObjects;
 
 import GameModels.ChatMessageModel;
-import javafx.scene.Node;
-import javafx.scene.paint.Color;
 
 /**
  *
@@ -24,15 +22,5 @@ public class ChatMessage extends GameObject {
         this.message = m;
         this.userID = id;
         model = new ChatMessageModel(m, id);
-    }
-
-    @Override
-    public Node getModel() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void updateModel(Double x, Double y, Double width, Color c) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

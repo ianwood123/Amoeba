@@ -20,12 +20,14 @@ import Messages.MoveTowardCoordinatesMessage;
 import Messages.MessageFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -38,6 +40,7 @@ import javafx.scene.shape.*;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
+import screen.Screen;
 
 /**
  *
@@ -52,7 +55,6 @@ public class Amoeba extends Application {
     MessageFactory mf;
     GameController gc;
     Codec codec = new CustomCodec();
-    Timeline renderTimeline = new Timeline();
         final Rectangle r = new Rectangle(0,0,800,600);
     
     @Override
@@ -68,12 +70,14 @@ public class Amoeba extends Application {
         incoming = new NetworkMessageQueue();
         nc = new NetworkController("localhost", 8080, codec, incoming, outgoing);
         
-        Group renderPane = new Group();
-        gc = new GameController(incoming, outgoing, mf, in, out);
+        Screen screen = new Screen();
+        screen.getGroup().getChildren().add(r);
+        
+        gc = new GameController(incoming, outgoing, mf, in, out, screen);
+        
+        
         StackPane container = new StackPane();
-      
-
-        container.getChildren().add(renderPane);
+        container.getChildren().add(screen.getGroup());
         container.setMinSize(800, 600);
         Button btn = new Button();
         
@@ -142,26 +146,19 @@ public class Amoeba extends Application {
                 outgoing.add(mf.createNetworkMessage(m));
             } catch (MessageException | NonExistentFieldException ex) {
                 Logger.getLogger(Amoeba.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            }        
         });
+        Timeline time = new Timeline();
+        time.getKeyFrames().add(new KeyFrame(Duration.millis(100),(e)->{
+                screen.update();
+        }));
+        time.setCycleCount(Timeline.INDEFINITE);
+        time.play();
         
         primaryStage.setTitle("Amoeba");
         primaryStage.setScene(scene);
         primaryStage.show();
-        
-        renderTimeline.getKeyFrames().add(new KeyFrame(Duration.seconds(0.16),(e)->{
-            render(renderPane);
-        }));
-        renderTimeline.setCycleCount(Timeline.INDEFINITE);
-        renderTimeline.play();
     }
-    public void render(Group p){
-
-        p.getChildren().clear();
-        p.getChildren().add(r);
-        p.getChildren().addAll(gc.getWorld().getModels());
-    }
-
     /**
      * @param args the command line arguments
      */

@@ -7,10 +7,17 @@ package Game;
 
 import Commands.Command;
 import Commands.CommandFactory;
+import DataModel.DataObject;
+import FXModel.FXObjectGenerator;
 import GameObjects.GameObject;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import screen.Screen;
 
 /**
  *
@@ -21,47 +28,51 @@ public class GameWorld implements Runnable{
     public final CommandFactory commandFactory;
     boolean exiting = false;
     protected ConcurrentLinkedQueue<Command> commands;
-    protected ConcurrentLinkedQueue<GameObject> objects;
+    private final Screen screen;
     
-
+    public ObservableList<Long> deletionQueue = FXCollections.observableList(new ArrayList());
     
-    public GameWorld() {
+    public ObservableList<Node> nodes = FXCollections.observableList(new ArrayList());
+    
+    
+    public GameWorld(Screen s) {
         this.commandProcessor = new CommandProcessor(this);
         this.commandFactory = new CommandFactory(this);
-        commands = new ConcurrentLinkedQueue();
-        objects = new ConcurrentLinkedQueue();
+        this.commands = new ConcurrentLinkedQueue();
+        this.screen = s;
+        nodes.addListener((ListChangeListener.Change<? extends Node> o)->{
+            while(o.next()){
+                    if(o.wasAdded()){
+                        for(Node n : o.getAddedSubList()){
+                            if(n instanceof FXObjectGenerator){
+                                FXObjectGenerator b = (FXObjectGenerator) n;
+                                screen.getAdditionQueue().add((Node) b);
+                            }
+                        }
+                    }
+            }
+        });
     }
 
-    public void addGameObject(GameObject go){
-        this.objects.add(go);
-    }
-    
-    public ArrayList<Node> getModels(){
-        ArrayList<Node> models = new ArrayList();
-        
-        for(GameObject go : this.objects){
-            models.add(go.getModel());
-        }
-        return new ArrayList<>(models);
-    }
-    
     @Override
     public void run() {
-            if(!commands.isEmpty()){
-                commandProcessor.process(commands);
-            }
-            if(!objects.isEmpty())
-            {   for(GameObject go: objects){
-                    if(go.tooDirty()){
-                        objects.remove(go);
+                for(DataObject dom : screen.getDataQueue()){
+                        GameObject go = (GameObject) dom;
+                        if(go.tooDirty()){
+                            deletionQueue.add(go.id.get());
+                        }
                     }
+                screen.getDataObjectRemovalQueue().addAll(deletionQueue);
+                deletionQueue.clear();
+                if(!commands.isEmpty()){
+                    commandProcessor.process(commands);
                 }
-            }
-            
-        }
-
-
-    public Iterable<GameObject> getObjects() {
-        return this.objects;
+                
+                
+        
+    }
+    
+    public synchronized Screen getScreen(){
+        return this.screen;
     }
 }

@@ -38,8 +38,7 @@ public class GameOutputHandler extends GameMessageHandler{
                     System.out.println(m);
                     this.net.add(m);
                 }
-                
+
             }
-    }
-    
+        }
 }

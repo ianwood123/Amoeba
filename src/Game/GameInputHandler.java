@@ -39,6 +39,5 @@ public class GameInputHandler extends GameMessageHandler {
                 }
                 CommandFactory.world.commands.add(CommandFactory.getCommandObject(queue.getNextMessage()));
             }
-        }
-    
+    }
 }
